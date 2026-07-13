@@ -1,0 +1,41 @@
+---
+title: "SIEM and OTLP export"
+description: "Stream your workspace's audit and security events to your SIEM over HTTP, or to an OpenTelemetry collector."
+---
+
+Passport can stream each workspace's audit and security events to your own SIEM and to an OpenTelemetry collector. Each workspace reads its own targets, so a tenant's events only ever go to that tenant's endpoints. Export is available on the Enterprise plan.
+
+## Configure the targets
+
+Both targets are set per workspace in Settings. Enter one or both:
+
+<CardGroup cols={2}>
+  <Card title="SIEM HTTP endpoint" icon="server">
+    An HTTP intake for a SIEM such as Splunk, Datadog, or Microsoft Sentinel. Passport POSTs a JSON body of the shape `{ "source": "mcp-passport", "events": [ ... ] }`.
+  </Card>
+  <Card title="OTLP endpoint" icon="diagram-project">
+    An OpenTelemetry collector base URL. Passport POSTs OTLP/JSON logs to `<endpoint>/v1/logs`, one log record per event, with a resource attribute `service.name = mcp-passport`.
+  </Card>
+</CardGroup>
+
+<Warning>
+  Both endpoints are validated when you save them and again every time they fire. In production they must be public HTTPS endpoints. Passport resolves the host and refuses private, loopback, link-local, and cloud-metadata addresses, and re-checks across any redirect it follows.
+</Warning>
+
+## Delivery behavior
+
+Export is best-effort and batched, tuned so a slow or down endpoint never affects the gateway hot path.
+
+- Events are queued and flushed on a 5 second tick, up to 200 events per batch.
+- A batch stays in the queue until it is delivered, so a transient outage retries rather than losing events (at-least-once).
+- When both targets are configured, a batch counts as delivered only once every configured target accepts it.
+- If an endpoint stays down, Passport backs off up to about 5 minutes between attempts.
+- The queue is bounded at 2000 events. If it overflows because the endpoint is slow or down, the oldest events are dropped to protect memory, and a warning is written to the server log so the gap is visible rather than silent.
+
+<Note>
+  Gaps are surfaced, not hidden. The exporter tracks queue depth, dropped-event count, consecutive failures, and the last error, so an operator can see when a stream is unhealthy.
+</Note>
+
+## Related: alert webhook
+
+Separately from the full event stream, a workspace can set an alert webhook URL (Slack-style) that receives a one-line JSON payload when a guardrail fires or an MCP's tool set changes. You can send a sample alert from Settings to verify the wiring before a real event. It is validated the same way as the export endpoints.

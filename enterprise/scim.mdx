@@ -1,0 +1,84 @@
+---
+title: "SCIM provisioning"
+description: "Make your identity provider the source of truth for who is in the workspace, so deprovisioning a user instantly revokes their access everywhere."
+---
+
+SCIM 2.0 lets your IdP (Okta, Microsoft Entra, Google) manage who belongs to the workspace and which teams they are on. The payoff is lifecycle control: deprovisioning a user in your IdP instantly revokes their access across every AI client and every connected account. SCIM is available on the Enterprise plan.
+
+## Endpoint and token
+
+The SCIM base URL for your workspace is:
+
+```
+https://<your-passport-host>/scim/v2
+```
+
+SCIM is off until you generate a bearer token. In Passport, open Settings and generate a SCIM token. The token is shown once, so copy it immediately. Point your IdP at the base URL above and authenticate with that token as an OAuth bearer token.
+
+<Note>
+  Generating the token requires the Enterprise plan. The token is stored as a one-way hash, so it cannot be recovered later. Generate a new one to rotate; delete it to turn SCIM off.
+</Note>
+
+## What Passport implements
+
+Passport implements the subset of SCIM that Okta and Entra actually drive:
+
+- **Users**: list (with `userName eq` filter), get, create, replace, patch, and delete.
+- **Groups**: list, get, create, and patch membership. Groups map to Passport teams.
+
+The `ServiceProviderConfig` advertises: patch supported, filter supported (max 200 results), and bulk, sort, and etag not supported. Group members removed from a group fall back to the "Unassigned" team.
+
+## Deprovisioning behavior
+
+This is the important part. When your IdP deactivates or deletes a user (most send `active: false`, some send `DELETE`), Passport does a full deprovision:
+
+<CardGroup cols={2}>
+  <Card title="Signed out everywhere" icon="right-from-bracket">
+    All sessions, AI client connections, and devices are cut immediately.
+  </Card>
+  <Card title="Grants revoked" icon="key">
+    Connected-account grants are dropped, so nothing sits at rest or re-arms on reactivation.
+  </Card>
+</CardGroup>
+
+Reactivating a user restores their access; they reconnect their own accounts.
+
+<Warning>
+  Passport refuses to deprovision the last active admin, to avoid locking the workspace out of all administration. That request returns a SCIM 409 with "Cannot deprovision the last active admin. Assign another admin in your IdP first, then retry." Assign a different admin first, then retry.
+</Warning>
+
+<Note>
+  Creating a new member or reactivating one counts against your plan's seat limit. On the Free plan, a request that would exceed the cap returns a SCIM 403 so your IdP records the failure rather than believing it provisioned someone.
+</Note>
+
+## Okta provisioning
+
+<Steps>
+  <Step title="Enable provisioning">
+    In your Okta app integration, open the Provisioning tab and configure the SCIM connection.
+  </Step>
+  <Step title="Set the base URL and token">
+    SCIM connector base URL: `https://<your-passport-host>/scim/v2`. Authentication mode: HTTP Header (OAuth Bearer Token) with the token you generated in Passport.
+  </Step>
+  <Step title="Enable the actions">
+    Turn on Create Users, Update User Attributes, and Deactivate Users. Push groups to map Okta groups to Passport teams.
+  </Step>
+</Steps>
+
+## Microsoft Entra provisioning
+
+<Steps>
+  <Step title="Add provisioning">
+    In your Entra enterprise application, open Provisioning and set the mode to Automatic.
+  </Step>
+  <Step title="Set the tenant URL and secret token">
+    Tenant URL: `https://<your-passport-host>/scim/v2`. Secret token: the token you generated in Passport. Test the connection.
+  </Step>
+  <Step title="Assign and start">
+    Assign users and groups to the application and start provisioning.
+  </Step>
+</Steps>
+
+<Note>
+  Passport correctly handles Entra's non-gallery SCIM client, which sends booleans as the strings "True" and "False". A deprovision from Entra is applied as a real deactivation, not a silent no-op.
+</Note>

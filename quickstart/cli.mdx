@@ -1,0 +1,151 @@
+---
+title: "Passport CLI"
+description: "Use the governed Passport gateway from Claude Code, Codex CLI, OpenCode, scripts, CI, and cron."
+---
+
+Passport CLI is the recommended Passport surface for terminal coding agents and headless automation. It is a thin client over the same governed gateway used by MCP clients. Member profiles share passes, per-client app selection, guardrails, approvals, and Activity through the same execution path. Non-interactive agent keys use their assigned pass, selection, guardrails, middleware, and audit trail, but do not raise a member approval prompt.
+
+Keep native MCP for GUI and hosted clients such as Cursor chat, VS Code chat, Claude Desktop, claude.ai, and ChatGPT. Claude Code and Codex CLI can use either surface; using the CLI does not disable MCP.
+
+## Install and sign in
+
+<Steps>
+  <Step title="Install once">
+    The `passport-bridge` package ships both `passport` and `passport-bridge`.
+
+    ```sh
+    npm i -g passport-bridge
+    passport version
+    ```
+  </Step>
+  <Step title="Sign in once per machine">
+    Copy the workspace id from your Passport URL. Login opens a browser and stores the resulting refresh credential in the existing `~/.passport/credentials.json` profile store with owner-only permissions.
+
+    ```sh
+    passport login --cloud https://passportmcp.com --workspace <workspace-id>
+    passport status
+    passport doctor
+    ```
+  </Step>
+  <Step title="Search, inspect, and run">
+    `search` returns namespaced tool names. Pass one directly to `describe` or `run`; no name translation is required.
+
+    ```sh
+    passport search "issues"
+    passport describe github_search_issues
+    passport run github_search_issues '{"query":"SSO"}'
+    ```
+  </Step>
+</Steps>
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `passport status` | Show the workspace, profile, policy client, and visible MCP connection states. |
+| `passport doctor` | Check the runtime, credential-store safety, endpoint, authentication, and exact CLI protocol without exposing credentials. |
+| `passport search [query]` | Discover allowed, namespaced tools. An empty query lists the visible catalog. |
+| `passport describe <tool>` | Print a tool's description, read-only flag, and full parameters schema. |
+| `passport run <tool> [json-args]` | Execute a governed tool call. Use `--args -` for stdin or repeat `--set` / `--set-json`. |
+| `passport connect [app...]` | Get or open a personal-account connection flow. Add `--wait <sec>` to wait for completion. |
+| `passport resources [uri]` | List resources or read one URI. |
+| `passport prompts [name]` | List prompts or get one, with repeatable `--set key=value` arguments. |
+| `passport completion <bash\|zsh\|fish>` | Generate shell completion locally without a profile or network request. |
+| `passport login` / `logout` | Create or revoke a named local profile. |
+| `passport help [verb]` / `version` | Inspect the CLI without a profile or network connection. |
+
+Every command accepts `--profile`, `--json`, `--timeout`, `--quiet`, and `--caller`.
+
+## Diagnose and complete
+
+`doctor` returns every check even when one fails. Human output includes a safe,
+actionable fix; `--json` returns a stable report suitable for support automation.
+Neither form prints credential values, response bodies, or member identity.
+
+```sh
+passport doctor
+passport doctor --json
+```
+
+Install generated completion in the standard location for your shell:
+
+```sh
+# Zsh
+mkdir -p ~/.zfunc
+passport completion zsh > ~/.zfunc/_passport
+
+# Bash
+mkdir -p ~/.local/share/bash-completion/completions
+passport completion bash > ~/.local/share/bash-completion/completions/passport
+
+# Fish
+mkdir -p ~/.config/fish/completions
+passport completion fish > ~/.config/fish/completions/passport.fish
+```
+
+## JSON and exit-code contract
+
+With `--json`, stdout contains exactly one JSON value. Hints and warnings go to stderr, so an agent can pipe results without stripping human output. JSON errors have this stable shape:
+
+```json
+{
+  "error": "A short message",
+  "cause": "approval_pending",
+  "exitCode": 4,
+  "approvalId": "optional",
+  "app": "optional"
+}
+```
+
+| Exit | Meaning |
+| ---: | --- |
+| 0 | Success. |
+| 1 | Network, server, or ambiguous execution error. Do not retry automatically. |
+| 2 | Authentication is missing, expired, or revoked. Run `passport login`. |
+| 3 | A personal app connection is required. Run `passport connect <app>`. |
+| 4 | Approval is pending. The result includes the approval id. |
+| 5 | Policy, a guardrail, client selection, or approval denial blocked the call. |
+| 6 | Usage error or unknown tool. |
+
+`passport run --wait <sec>` retries only a definite `approval_pending` response. It never retries a timeout or network failure because the execution outcome could be ambiguous.
+
+## Profiles and attribution
+
+The default profile uses `cli` as its policy client. To keep app selection and Activity distinct for a specific terminal agent, create a per-agent profile:
+
+```sh
+passport login \
+  --cloud https://passportmcp.com \
+  --workspace <workspace-id> \
+  --client claude-code \
+  --profile claude-code@work
+
+PASSPORT_PROFILE=claude-code@work passport search "issues"
+```
+
+Passport can also add cooperative caller detail from known agent environment variables. `--caller <id>` takes precedence. Activity labels it as self-reported, for example **Passport CLI · Codex via CLI**; the authenticated member or agent and the policy client remain separate identities.
+
+OpenCode is a first-class policy identity too. Use `--client opencode --profile opencode@work` when its selection and Activity should remain distinct from other terminal agents.
+
+## Headless, CI, and cron
+
+Create an agent identity and key under **Settings → Advanced → Headless & CI**, then inject both variables through your CI secret store. Environment-key mode wins over local profiles, writes nothing to disk, and works without `passport login`.
+
+```sh
+export PASSPORT_AGENT_KEY='<agent-key>'
+export PASSPORT_ENDPOINT='https://passportmcp.com/w/<workspace-id>/mcp'
+
+passport status --json
+passport search "failed builds" --json
+passport run sentry_list_issues '{"status":"unresolved"}' --json
+```
+
+Agent keys can inspect status and call allowed tools, but cannot mint a person's sign-in link. Use `passport connect` from an interactive member profile when an app needs personal OAuth.
+
+Agent keys are also non-interactive: they do not create action-time member
+approval prompts. Use a member profile for an operation that must pause for a
+human's one-off approval.
+
+<Note>
+  The CLI never wraps provider APIs directly and never bypasses the gateway. It calls Passport's governed meta-tools and MCP resource/prompt methods, so CLI and MCP usage share one policy and audit pipeline.
+</Note>

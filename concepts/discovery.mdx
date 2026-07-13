@@ -1,0 +1,50 @@
+---
+title: "Tool discovery modes"
+description: "How the workspace gateway exposes tools as your fleet grows: flat, apps, compact, and auto."
+---
+
+Tool definitions cost context on every request, and an AI client's tool selection gets worse as the count climbs. Passport controls how the workspace endpoint presents tools so a large fleet stays usable. The inventory of what a person can reach stays visible at every tier; only the full tool definitions become lazy.
+
+You set the mode in Settings. The default is `auto`.
+
+## The three tiers
+
+<CardGroup cols={3}>
+  <Card title="Flat" icon="list">
+    Every permitted tool is defined up front. Best experience with no indirection, for small setups.
+  </Card>
+  <Card title="Apps" icon="grip">
+    One meta-tool per MCP, named for the MCP (for example `github`, `supabase`). The tool list itself is the readable inventory; each MCP's tool definitions load on demand inside its meta-tool.
+  </Card>
+  <Card title="Compact" icon="magnifying-glass">
+    Two global meta-tools (a search and a call) whose descriptions carry the MCP manifest. For very large fleets.
+  </Card>
+</CardGroup>
+
+## How auto chooses
+
+When the mode is `auto`, the workspace endpoint picks a tier from the count of permitted tools and MCPs for the caller:
+
+<Steps>
+  <Step title="Flat, until the threshold">
+    While the total number of permitted tools is at or below the discovery threshold (default 40), the gateway serves flat.
+  </Step>
+  <Step title="Apps, past the threshold">
+    Once the tool count passes the threshold, the gateway switches to one meta-tool per MCP, as long as there are 24 or fewer permitted MCPs.
+  </Step>
+  <Step title="Compact, for very large fleets">
+    With more than 24 permitted MCPs, the gateway switches to the two global meta-tools.
+  </Step>
+</Steps>
+
+You can pin any single tier instead of `auto`, and you can change the threshold (any value from 1 to 500).
+
+<Note>
+  Auto only applies to the workspace endpoint (`/mcp` and `/w/{workspace}/mcp`). A per-MCP endpoint (`/s/{appKey}/mcp`) and a bundle endpoint (`/b/{bundleKey}/mcp`) are already curated slices, so they always stay flat regardless of this setting.
+</Note>
+
+## Why the inventory always stays visible
+
+Hiding the inventory would make an AI client capability-blind. It would answer "I don't have GitHub" on clients that never proactively search. So at every tier the list of MCPs a person can reach stays readable. In `apps` mode the tool list is that inventory. In `compact` mode the meta-tool descriptions carry it. Only the detailed per-tool definitions load on demand, which is what keeps the context cost down.
+
+The [repeatable context-efficiency benchmark](/benchmarks/context-efficiency) measures the definition, task-context, wire, result, CLI-process, and latency costs of flat MCP, compact MCP, and Passport CLI against the same deterministic governed task.

@@ -1,0 +1,54 @@
+---
+title: "Network and egress"
+description: "How Passport guards outbound requests to admin-supplied URLs, and what the desktop app and bridge talk to."
+---
+
+Passport makes outbound requests on your behalf to endpoints an admin supplies: MCP servers, the alert webhook, the SIEM and OTLP export endpoints, and your SSO issuer. Because those URLs are attacker-influenceable in a hosted, multi-tenant deployment, every such request goes through one SSRF-hardened path.
+
+## SSRF posture for admin-supplied URLs
+
+Every outbound URL is checked before it is dialed, and the check is stricter in production than on a self-hosted appliance.
+
+<Steps>
+  <Step title="Scheme and metadata check (always)">
+    Only `http` and `https` URLs are allowed. Cloud-metadata endpoints (`169.254.169.254`, `metadata.google.internal`, `metadata`) are always blocked, in every environment.
+  </Step>
+  <Step title="HTTPS and literal-address check (production)">
+    In production the URL must be HTTPS. Literal IPs are range-checked and rejected if they are loopback, private (RFC 1918), or link-local, including IPv6 loopback, unique-local, link-local, and IPv4-mapped IPv6 forms. `localhost` and any `.localhost` host are blocked.
+  </Step>
+  <Step title="DNS resolution check (production)">
+    For a hostname (not a literal IP), Passport resolves it and rejects the request if any resolved address falls in those private, loopback, link-local, or metadata ranges. This closes the DNS-rebinding and internal-hostname holes a string check cannot see.
+  </Step>
+  <Step title="Redirect re-validation (production)">
+    Redirects are followed manually rather than automatically. Every hop is re-checked with the same rules, the chain is capped at five hops, and the Authorization header is dropped on a cross-origin hop so a redirect cannot exfiltrate a bearer token to another host.
+  </Step>
+</Steps>
+
+This single guarded path covers MCP endpoint dials, OIDC discovery, JWKS, token and userinfo fetches, MCP OAuth discovery and registration, the alert webhook, and SIEM and OTLP export.
+
+<Note>
+  On a self-hosted appliance (any non-production run), Passport trusts the operator's own network, so loopback and private addresses are allowed. The metadata-endpoint block still applies everywhere.
+</Note>
+
+When you save an MCP URL, webhook, SIEM or OTLP endpoint, or SSO issuer that fails these checks, Passport refuses it with a clear message rather than storing a URL it could never safely reach. The webhook test button uses the same guard, so a "test" can never reach an internal address the real alert could not.
+
+## Desktop app and bridge egress
+
+The desktop app and the bridge are built to talk to your own Passport server and almost nothing else.
+
+<CardGroup cols={2}>
+  <Card title="Fonts and icons are bundled" icon="font">
+    The app's fonts and connector icons are bundled into the app and loaded from local files, so it renders branded offline with no network font fetch.
+  </Card>
+  <Card title="Product traffic goes to your server" icon="server">
+    All of the app's and bridge's API calls go to your workspace's Passport server. Upstream credentials are brokered server-side and never written into an AI client config.
+  </Card>
+</CardGroup>
+
+The one fixed third-party request the desktop app makes is the auto-updater feed, which points at the public GitHub releases repository. Updates are cryptographically signature-verified before they are applied.
+
+<Note>
+  Links the app opens for you, such as the sign-up page or a hosted client's connector settings, open in your system browser as ordinary navigations. They are not in-app network calls.
+</Note>
+
+Passport does not send telemetry or analytics to the vendor by default. When you self-host, the hosted service never touches your data.

@@ -1,0 +1,43 @@
+---
+title: "Activity and audit"
+description: "Every governed tool call, attributed and exportable, plus a separate trail of privileged admin actions."
+---
+
+Passport keeps two records: an activity log of every tool call your team makes through the gateway, and an audit log of privileged admin actions. Both are exportable, and Enterprise workspaces can stream them to a SIEM.
+
+## Activity
+
+Every governed tool call lands in Activity, live and attributable. Each entry carries the person, their email and team, the MCP, the tool, the AI client the call came from, the outcome (ok, error, or blocked), the duration, and a summary.
+
+Passport CLI calls can also carry a cooperative caller label, shown as **via CLI** and explicitly marked self-reported. This helps distinguish a shell call made by Codex from one made by Claude Code without treating an environment hint as an authenticated identity. The member or agent and the policy client remain authoritative.
+
+Because `blocked` is a distinct outcome, you can see guardrails working as intended rather than mistaking policy enforcement for errors.
+
+### Filters and deep links
+
+You can filter activity by person, MCP, and outcome, and the filter is encoded in the URL, so a filtered view is a shareable link. Guardrail alerts, for instance, deep-link straight into the matching, pre-filtered activity view.
+
+## Audit
+
+The audit log is a separate trail of privileged actions: approving or removing an MCP, changing a person's role, creating a guardrail, generating a SCIM token, and so on. Each entry records the actor, the action, the target, and a detail such as the old and new value.
+
+## Export
+
+<CardGroup cols={2}>
+  <Card title="Activity" icon="table">
+    `GET /export/activity.csv` and `GET /export/activity.jsonl`. Both accept the same `member`, `app`, `outcome`, and `department` filters as the activity view, so you can export exactly the slice you are looking at. The JSONL export is SIEM-shaped, one JSON object per line.
+  </Card>
+  <Card title="Audit" icon="file-lines">
+    `GET /export/audit.csv` exports the privileged-action trail.
+  </Card>
+</CardGroup>
+
+There is also a full workspace backup at `GET /export/workspace.json`. All export endpoints are admin-only.
+
+<Note>
+  Secrets never reach these exports. Anything a guardrail would flag is scrubbed from the activity entry before it is persisted, so a blocked credential cannot leak through the CSV or JSONL you share in an incident review. See [Guardrails](/admin/guardrails).
+</Note>
+
+## Stream to your SIEM
+
+On the Enterprise plan you can stream both logs to your SIEM over HTTP and to an OpenTelemetry collector, per workspace. See [SIEM and OTLP export](/enterprise/siem-export).

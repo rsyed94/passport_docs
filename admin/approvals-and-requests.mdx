@@ -1,0 +1,69 @@
+---
+title: "Catalog access, passes, and requests"
+description: "Choose how members connect catalog apps, grant scoped passes, and handle Enterprise requests."
+---
+
+Every plan can browse the same verified catalog. Free and Pro make verified catalog apps self-service and read-only by default. Enterprise admins can keep that open experience or require review and apply rollout rules.
+
+## Add an MCP
+
+Add an MCP two ways:
+
+<CardGroup cols={2}>
+  <Card title="From the catalog" icon="grid">
+    Choose a probe-verified connector. Members click Connect; Passport applies the workspace's catalog policy automatically.
+  </Card>
+  <Card title="By URL" icon="link">
+    Point Passport at any MCP server by URL. It connects, discovers the tools, and scans them.
+  </Card>
+</CardGroup>
+
+Each MCP authenticates upstream in one of three ways: a single company account for everyone (`org`), each person's own account (`member`, through an OAuth broker), or no auth (`none`).
+
+<Note>
+  Some connectors need a one-time company OAuth client before anyone can connect them (when the provider does not support dynamic registration). Passport shows a "needs admin setup" state and the callback URL to register, rather than a dead-end member sign-in.
+</Note>
+
+## Enterprise catalog modes
+
+- **Open**: verified catalog apps connect without an admin decision.
+- **Review**: the first Connect intent creates or joins a grouped request.
+- **Rules**: allow or review by app, category, and team, with an explicit block for exceptions.
+
+Approval defaults to the requesters with a read-only pass. An admin can widen it to a team or the workspace. API keys and manual OAuth clients stay in setup until their readiness check passes; requesters are notified only when they can actually connect.
+
+## Passes and access
+
+A pass is what a person can do with an MCP:
+
+- **Full**: every tool, including writes.
+- **Read-only**: only the tools marked read-only. Write tools are hidden from the tool list entirely, so an AI client never sees a capability its user cannot call.
+- **None**: no access; the MCP is not advertised to that person.
+
+Access resolves from three layers, strongest last:
+
+<Steps>
+  <Step title="Workspace default or selected scope">
+    Grant a default pass to everyone, or scope the MCP to selected teams and people only.
+  </Step>
+  <Step title="Per-team passes">
+    Give a team its own pass, for example read-only GitHub for Support.
+  </Step>
+  <Step title="Per-person overrides">
+    Override a specific person, which wins over the team and default.
+  </Step>
+</Steps>
+
+<Note>
+  How read-only is decided: a tool is treated as read-only only when it is provably so, from its name (verbs like get, list, search, read, find, fetch, describe, show, query) or a trusted upstream's own read-only hint. Anything not provably read-only counts as a write and is withheld under a read-only pass.
+</Note>
+
+## Per-tool control and drift
+
+Within an MCP you can turn individual tools on or off, workspace-wide, and choose whether newly discovered tools default on or off. Passport snapshots each MCP's tool set and detects drift, so you are alerted when an upstream's tools change rather than silently gaining new capabilities.
+
+## Requests
+
+In a managed Enterprise catalog, Connect creates or joins one durable request for that MCP. The admin sees every requester together and can allow the requesters, their teams, or the workspace. If company setup is required, the request moves through **Approved · setup in progress** and becomes **Ready to connect** only after the credential or OAuth client is configured.
+
+On every plan, a provider that requires a company credential creates an admin setup task rather than pretending the app is ready. Custom and unverified endpoints are always admin-managed.
