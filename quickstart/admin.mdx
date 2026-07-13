@@ -1,0 +1,52 @@
+---
+title: "Workspace owner quickstart"
+description: "Connect your first MCP and AI client, invite people, and watch the first governed call land in Activity."
+---
+
+Free and Pro open directly in the personal Apps experience and keep workspace ownership lightweight. Enterprise keeps the same personal setup under **For me** and adds a separate control plane for policy and managed rollout.
+
+## Create your workspace
+
+Sign up at [passportmcp.com](https://passportmcp.com) and confirm your email, or stand up your own deployment (see [Self-host](/self-host)). The first person in a workspace is its admin. Joining is invite-only by default, so no one else can appear in your workspace until you add them.
+
+## 1. Connect your first MCP
+
+Connect the first MCP you want to use. You have two paths:
+
+<CardGroup cols={2}>
+  <Card title="From the catalog" icon="grid">
+    Pick from the probe-verified catalog. Free and Pro use one-step self-service Connect. Enterprise can keep that flow open or require review.
+  </Card>
+  <Card title="By URL" icon="link">
+    Point Passport at any MCP server by URL. Passport connects, discovers its tools, and scans them.
+  </Card>
+</CardGroup>
+
+Catalog apps start read-only, so an AI client never sees a write capability its user cannot call. On Free and Pro, verified apps are self-service; the owner only steps in when an app needs company setup or a custom endpoint. Enterprise admins can additionally require review and scope rollout to requesters, teams, or the workspace. See [Catalog access and passes](/admin/approvals-and-requests).
+
+## 2. Connect an AI client
+
+Connect one of your own AI clients so you can test the gateway end to end. The macOS desktop app wires Claude, Claude Code, Cursor, VS Code, and Codex to your workspace in one click, and gives you a paste-in connector URL for ChatGPT and Claude.ai. See the [member quickstart](/quickstart/member) for the install steps.
+
+## 3. Invite your team
+
+On Free and Pro, open **Settings → Workspace essentials → Manage workspace** to invite people and manage the lightweight roster. On Enterprise, open **Workspace controls → People** to assign roles and teams, manage lifecycle, and apply organization-wide policy. See [People and teams](/admin/people-and-teams).
+
+## 4. See your first governed call
+
+Ask a connected AI client to use one of your MCPs. Within seconds the call lands in Activity, attributed to you, with the client, tool, and outcome. That first governed call completes the checklist.
+
+<Note>
+  Activity is live and attributable, and exportable as CSV or JSONL. See [Activity and audit](/admin/activity-and-audit).
+</Note>
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Understand guardrails" icon="filter" href="/admin/guardrails">
+    Built-in secret detection protects every plan. Enterprise adds custom block, redact, and alert rules.
+  </Card>
+  <Card title="Enterprise controls" icon="building" href="/enterprise/sso-oidc">
+    Manage catalog approvals and rollout rules, connect SSO, provision with SCIM, and stream audit events to your SIEM.
+  </Card>
+</CardGroup>

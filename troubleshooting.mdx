@@ -1,0 +1,77 @@
+---
+title: "Troubleshooting"
+description: "The common issues members and admins hit, and what each one means."
+---
+
+## "Redirect URI is not allowed" at an MCP's sign-in screen
+
+Some MCP providers (Mintlify, for example) accept Passport's automatic OAuth registration but only allow sign-ins that redirect to domains you have allowlisted in their own settings. The sign-in reaches the provider's authorize screen, then fails with a redirect URI error.
+
+Fix it in the provider's dashboard, not in Passport: add your Passport domain (or the full callback URL) to the provider's allowed domains or redirect settings. Your callback is:
+
+```
+https://<your-passport-domain>/auth/connect-app/callback
+```
+
+Admins can copy this exact URL two ways: from the MCP's Manage panel under "Sign-in service", or from the Add-an-MCP screen when adding a custom MCP that signs in per member (it shows a "Callback URL" field to copy).
+
+On Mintlify specifically: go to Admin, then MCP, then "Allowed OAuth redirect URIs", and use the "Add domain" field there. Do not confuse this with Mintlify's "Set up your custom domain" screen, which points your DNS at Mintlify to host a docs site and is unrelated to connecting an MCP. If your organization has more than one Mintlify deployment, the redirect must be allowed by each deployment, so add the domain in every deployment's MCP settings, or pick the specific deployment on the consent screen instead of "All deployments".
+
+## Tools do not appear after connecting
+
+When an admin approves a new MCP or a member connects an account, the bridge picks up the change and pushes it to running AI clients within about 15 seconds, with no restart for spec-compliant clients such as Claude and Cursor.
+
+If the tools still do not appear:
+
+- **Claude and Cursor**: they re-list automatically. If nothing shows after ~15 seconds, restart the client once.
+- **Claude Code and Codex**: new sessions pick up the change. Start a new session.
+
+The app says as much when you connect: "will pick this up in ~15 seconds (restart if it doesn't appear)."
+
+For Passport CLI, run `passport status` to confirm the MCP is visible to the active profile, then `passport search` again. The CLI does not cache tool definitions between invocations. If an MCP is absent, check that the profile's policy client is allowed to see it under AI Clients in Passport.
+
+## Passport CLI exits with a non-zero code
+
+The CLI uses stable exit codes so agents do not need to parse prose: `2` means sign in again, `3` means connect the named app, `4` means approval is pending, `5` means policy, a guardrail, client selection, or an approval denial blocked the call, and `6` means the command or tool name is invalid. Exit `1` includes ambiguous network failures and must not be retried automatically. Run with `--json` for the structured `cause` and any `approvalId` or app hint.
+
+## Restart the AI client once after connecting
+
+Some AI clients cache their tool list at launch and do not react to a live update. After you connect an account or an admin enables an MCP, if the tools have not appeared within ~15 seconds, restart the AI client once and they will be there.
+
+## Claude tools appear twice
+
+If Claude Desktop shows each Passport tool twice, you likely have both the desktop bridge and the Claude.ai connector active for Claude. The Claude.ai connector also syncs into Claude Desktop, so running both means duplicate tools.
+
+The desktop app flags this on the Claude row: "Also covered by your Claude.ai connector. Remove one to avoid duplicate tools." Disconnect one of the two.
+
+## "A different workspace" / reconnect prompts
+
+Passport fails closed rather than attribute your activity to the wrong workspace. If a machine's stored Passport credential now belongs to a different workspace than the one a client started serving, you will see one of:
+
+- In the desktop app, on the client row: "Connected to another workspace (...). Reconnect to use ...".
+- From the bridge, surfaced to the AI client: "This machine's Passport credential now belongs to a different workspace. Reconnect this client from the Passport app."
+
+Reconnect that client from the Passport app to fix it. This commonly happens after you sign the same machine into a second workspace.
+
+## Rate limited: error code -32029
+
+The gateway enforces per-connection and per-workspace rate limits. When you hit one, the call returns HTTP 429 with a `Retry-After` header and a JSON-RPC error with code `-32029`. The message tells you which limit you hit:
+
+- The per-connection cap (default 240 requests per minute): "This connection is sending requests too quickly. Slow down and retry shortly."
+- The per-workspace cap (default 600 requests per minute): "Your workspace has hit its gateway rate limit. Requests will resume in a moment."
+- The per-workspace concurrency cap (default 32 simultaneous requests): "Your workspace has too many gateway requests in flight. Retry in a moment."
+
+The limits reset within the window; wait for the `Retry-After` interval and retry. Operators can tune the caps (see [Self-host](/self-host)).
+
+## "This account has been deactivated"
+
+A deactivated or deprovisioned member cannot sign in or use the gateway. Depending on where they hit it, they see:
+
+- From the gateway: "This account has been deactivated." (HTTP 403).
+- On the sign-in page: "Your account has been deactivated. Contact your workspace admin."
+
+Deactivation signs the person out everywhere and revokes their connected-account grants. An admin can reactivate them in People; they then reconnect their own accounts.
+
+## "This connection isn't signed in"
+
+If an AI client's connection is no longer signed in, the gateway returns 401 with "This connection isn't signed in. Open Passport and reconnect this AI client." Open the Passport app and reconnect that client.

@@ -1,0 +1,60 @@
+---
+title: "Guardrails"
+description: "Built-in secret scanning on every plan, with Enterprise custom block, redact, and alert rules."
+---
+
+Guardrails scan every tool call that flows through the gateway, both the arguments going out and the results coming back. They run server-side, so an AI client cannot talk its way past them. Built-in secret detection protects every plan; creating custom workspace rules requires Enterprise.
+
+## The engine
+
+For each call, applicable rules run in two passes:
+
+<Steps>
+  <Step title="Blocks, against the original text">
+    Block rules are checked first, on the unmodified content, so an earlier redaction cannot hide a match from a later block. A match refuses the call and raises an alert.
+  </Step>
+  <Step title="Redactions and alerts">
+    Redact rules replace each match with a redaction marker on the wire. Alert-only rules let the content through but log that they matched.
+  </Step>
+</Steps>
+
+A rule can scan arguments, results, or both, and can apply to all MCPs or only named ones.
+
+## Built-in secret detection
+
+Every workspace has a built-in secrets rule that catches credentials before they cross the wire in either direction. It detects, among others:
+
+- AWS access keys
+- GitHub tokens
+- Slack tokens
+- OpenAI keys
+- Stripe keys
+- PEM private keys
+- Passport's own session, access, refresh, and agent-key tokens
+- password assignments
+
+These patterns are vetted to run in linear time, so the rule scans the whole payload (up to a 5 MB ceiling). A secret deep inside a large tool result, such as a file read or a database dump, is still caught.
+
+## Actions
+
+<CardGroup cols={3}>
+  <Card title="Block" icon="ban">
+    Refuse the call when a match is found, and raise an alert.
+  </Card>
+  <Card title="Redact" icon="eye-slash">
+    Replace matches with a redaction marker and let the (now clean) call through.
+  </Card>
+  <Card title="Alert" icon="bell">
+    Let the call through, but log that the rule matched.
+  </Card>
+</CardGroup>
+
+## Enterprise custom rules
+
+On Enterprise, a custom rule matches a regular expression, or a plain phrase if the pattern is not valid regex. Passport rejects patterns that are unsafe to run on every call: a pattern longer than 200 characters, or one with the classic catastrophic-backtracking shape (a repeated group inside a repeat). Custom patterns are also bounded in how much text they scan, so a slow pattern can never wedge the gateway.
+
+## Alerts and the audit log
+
+A guardrail hit raises an alert in the app. Enterprise workspaces can also send it to a configured alert webhook (see [SIEM and OTLP export](/enterprise/siem-export)).
+
+Guardrails also protect the audit trail itself. Whatever a guardrail would flag, including a blocked secret, is scrubbed from the persisted activity entry before it is written, so a credential never survives in the Activity table, the member API, or the CSV and JSONL exports. The one exception is a custom alert-only rule, whose whole purpose is to surface the matched content for review.

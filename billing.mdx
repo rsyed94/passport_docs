@@ -1,0 +1,60 @@
+---
+title: "Plans and billing"
+description: "What each plan includes, how seats are counted, and how to change or cancel a plan."
+---
+
+Passport has three plans. Every plan includes the full verified catalog and the focused personal product: Apps, AI Clients, personal Activity, safety preferences, the desktop app, Passport CLI, and the shared gateway. Pro removes the usage caps. Enterprise adds the workspace control plane for managed catalog policy, people and teams, client fleet controls, workspace guardrails, and organization-wide audit.
+
+## Plans
+
+<CardGroup cols={3}>
+  <Card title="Free" icon="gift">
+    **$0 forever.** The full verified catalog for small teams. Up to 5 members and 5 connected MCPs, with self-service Connect, the desktop app, Passport CLI, and every supported AI client.
+  </Card>
+  <Card title="Pro" icon="rocket">
+    **$15 per member per month.** Everything in Free without the caps. Unlimited members and MCPs, with the verified catalog available through one-step Connect.
+  </Card>
+  <Card title="Enterprise" icon="building">
+    **$30 per member per month.** Everything in Pro, plus workspace controls for people, teams, clients, and guardrails; a managed catalog; approval workflows; scoped rollout rules; SSO with your own IdP; SCIM provisioning; SIEM and OTLP audit streaming; a DPA on request; and annual invoicing by email. Still self-serve, card in.
+  </Card>
+</CardGroup>
+
+The Enterprise plan is also what gates tenant-authored custom middleware where an operator has enabled it.
+
+## Catalog access and control
+
+Free and Pro use the verified catalog in **open** mode. A member chooses **Connect** and Passport either connects the app immediately or asks the workspace owner for a shared credential when the provider technically requires one. Free's five-MCP limit applies to connected MCPs, not what you can discover. Pausing one does not free a slot.
+
+Enterprise admins can keep the catalog open, require review for new apps, or apply rollout rules by app, category, and team. Requests are grouped, access starts read-only, and an app is not announced as ready until required company setup is complete.
+
+Workspace owners can finish technical setup on every plan: company API keys, manual OAuth clients, custom endpoints, and app removal stay available without mounting the Enterprise control plane. The built-in credential scanner and each person's action-time safety preferences also stay on every plan. Enterprise adds custom workspace guardrails, scoped rollout, team and fleet policy, and organization-wide audit export.
+
+Passport CLI is included on every plan. It uses the same governed gateway as MCP-connected clients and does not create a second billing, policy, or audit path.
+
+## How seats are counted
+
+Anyone who can sign in counts as a member, admin or not. Agent identities you create for automation are free: they count toward the limit only on the Free plan, and a paid plan never charges a seat for an agent.
+
+On a paid plan, your seat count is the number of active people (admins and members). Passport reconciles that count onto your Stripe subscription automatically as your roster grows or shrinks, and Stripe prorates the difference. You do not manage seat quantities by hand.
+
+## At the Free limit
+
+The Free plan includes 5 members and 5 connected MCPs. You can still browse the entire verified catalog. Adding a sixth member or connecting a sixth MCP is blocked until you upgrade to Pro. Nothing is deleted, and everyone already on the workspace keeps working.
+
+## Upgrade, change, or cancel
+
+<Steps>
+  <Step title="Upgrade">
+    In the app, open Settings, then Billing, and upgrade. You are taken to Stripe Checkout to enter a card.
+  </Step>
+  <Step title="Change plan">
+    A plan change on an existing subscription happens through the Stripe customer portal, which edits your one subscription in place and prorates. Passport never opens a second checkout on an existing customer, so you are never double-billed on an upgrade.
+  </Step>
+  <Step title="Cancel">
+    Cancel yourself anytime from Settings, Billing through the Stripe portal, no email required. You keep your paid plan until the current period ends, then move to Free. Your data stays until you delete the workspace.
+  </Step>
+</Steps>
+
+<Note>
+  On a self-hosted deployment with no Stripe key configured, billing does not exist and every workspace has everything unlocked. See [Self-host](/self-host).
+</Note>

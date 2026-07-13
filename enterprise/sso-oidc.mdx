@@ -1,0 +1,96 @@
+---
+title: "Single sign-on (OIDC)"
+description: "Connect your workspace to your identity provider with OpenID Connect. Includes Okta and Microsoft Entra walkthroughs."
+---
+
+Passport signs people in through your identity provider using OpenID Connect (authorization code with PKCE). Each workspace brings its own IdP, configured in Settings. Sign-in is available on the Enterprise plan.
+
+## How it works
+
+When SSO is configured, the sign-in page redirects to your IdP. Passport exchanges the authorization code for tokens, then validates the ID token cryptographically: the signature against your IdP's JWKS, plus the issuer, audience, and a per-attempt nonce. The email address is taken from the verified token (falling back to the userinfo endpoint only if the token omits it), and it must be a verified email. This is what proves your IdP actually vouched for the identity rather than trusting an unsigned response.
+
+<Note>
+  Passport does not hard-fail when the IdP omits the `email_verified` claim entirely (Microsoft Entra and some Okta or Google configurations do). Because your admin configured that exact issuer and the ID token is already cryptographically validated, an absent claim is trusted. An explicit `email_verified: false` is still rejected.
+</Note>
+
+## What you need
+
+<CardGroup cols={3}>
+  <Card title="Issuer URL" icon="link">
+    Your IdP's issuer, for example `https://your-org.okta.com`. Passport reads its discovery document at `/.well-known/openid-configuration`.
+  </Card>
+  <Card title="Client ID and secret" icon="key">
+    From a web application (confidential client) you register in your IdP.
+  </Card>
+  <Card title="Redirect URI" icon="arrow-right-to-bracket">
+    `https://<your-passport-host>/auth/callback`
+  </Card>
+</CardGroup>
+
+The requested scopes are `openid email profile`.
+
+<Warning>
+  The issuer URL is validated when you save it. In production it must be a public HTTPS endpoint. Passport resolves the host and refuses issuers that point at private, loopback, link-local, or cloud-metadata addresses, and re-checks on every redirect it follows. An internal or non-HTTPS issuer will be rejected with "That identity-provider URL isn't allowed."
+</Warning>
+
+## Configure SSO in Passport
+
+<Steps>
+  <Step title="Register an application in your IdP">
+    Create a web application (confidential client) with the redirect URI `https://<your-passport-host>/auth/callback`. Note the client ID and client secret.
+  </Step>
+  <Step title="Enter the details in Settings">
+    In Passport, open Settings and set the issuer URL, client ID, and client secret. The secret is encrypted at rest. Save.
+  </Step>
+  <Step title="Test the sign-in">
+    Sign out and visit the sign-in page. It should redirect to your IdP and return you signed in.
+  </Step>
+</Steps>
+
+<Note>
+  When a workspace uses its own configured IdP, the IdP vouching for a person is treated as proof they belong to the company, so they auto-join. If the workspace has no admin yet, the first person to sign in through its own IdP becomes the admin.
+</Note>
+
+## Okta walkthrough
+
+<Steps>
+  <Step title="Create the app integration">
+    In the Okta Admin Console, go to Applications, then Create App Integration. Choose OIDC - OpenID Connect and Web Application.
+  </Step>
+  <Step title="Set the redirect URI">
+    Under Sign-in redirect URIs, add `https://<your-passport-host>/auth/callback`.
+  </Step>
+  <Step title="Assign users">
+    Assign the people or groups who should be able to sign in.
+  </Step>
+  <Step title="Copy the credentials">
+    From the app's General tab, copy the Client ID and Client secret. Your issuer is your Okta org URL, for example `https://your-org.okta.com`.
+  </Step>
+  <Step title="Enter them in Passport">
+    Paste the issuer, client ID, and secret into Passport Settings and save.
+  </Step>
+</Steps>
+
+## Microsoft Entra ID walkthrough
+
+<Steps>
+  <Step title="Register an application">
+    In the Microsoft Entra admin center, go to App registrations, then New registration.
+  </Step>
+  <Step title="Set the redirect URI">
+    Add a Web platform redirect URI of `https://<your-passport-host>/auth/callback`.
+  </Step>
+  <Step title="Create a client secret">
+    Under Certificates and secrets, create a new client secret and copy its value.
+  </Step>
+  <Step title="Find your issuer">
+    Your issuer is `https://login.microsoftonline.com/<tenant-id>/v2.0`. Use the tenant ID from the app's Overview page.
+  </Step>
+  <Step title="Enter them in Passport">
+    Paste the issuer, the Application (client) ID, and the client secret into Passport Settings and save.
+  </Step>
+</Steps>
+
+<Note>
+  Entra typically omits `email_verified`. Passport handles this correctly, as described above, so Entra sign-in works without extra configuration.
+</Note>

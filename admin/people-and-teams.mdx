@@ -1,0 +1,48 @@
+---
+title: "People and teams"
+description: "Use Enterprise workspace controls to manage people, roles, teams, and lifecycle."
+---
+
+People and Teams are part of the **Enterprise workspace control plane**. Free and Pro owners reach the lightweight Workspace page from **Settings → Workspace essentials** to invite people and manage ownership; Enterprise adds roles, teams, directory policy, scoped access, and lifecycle controls.
+
+## Roles
+
+Every member has one of three roles:
+
+| Role | Can do |
+| --- | --- |
+| Admin | Approve MCPs, manage people and teams, set guardrails and policy, and see the audit trail. |
+| Member | Connect their AI clients and use the MCPs their passes permit. |
+| Agent | A non-human identity for automation, authenticated by an agent key rather than a browser session. |
+
+## Add people
+
+Add teammates on the People page as admins or members, and Passport emails each an invite. You can also copy your workspace sign-in link and share it directly. A person's team is their department; assign it when you add them or change it later.
+
+The People roster can be searched and filtered by team, role, or account status. Open a person to review their recent governed Timeline, jump to their complete filtered audit trail, or edit their title, team, and role. Profile changes remain a draft until you select **Save changes**; closing the panel discards them.
+
+## Manage teams
+
+Teams have their own page under **Workspace controls**. Each team card shows its roster and shared MCP-rule count, with direct actions for membership, activity, rename, and deletion. Renaming a team carries its access rules forward. Deleting one asks where its people should move before removing the team's shared rules.
+
+## Who can join
+
+By default, joining is invite-only: only people already on the roster can sign in, so no stranger appears in your workspace. You can instead allow anyone who verifies an email on a company domain to join as a member (a Slack-style domain policy). You control this and the list of allowed domains in Settings.
+
+<Note>
+  Consumer and disposable email domains never trigger domain join or domain discovery, so shared providers like gmail.com can never be used to walk into your workspace.
+</Note>
+
+## Deactivate and reactivate
+
+Deactivating a member immediately signs them out everywhere and revokes their connected-account grants, so nothing sits at rest or re-arms later. Reactivating restores access; they reconnect their own accounts. Sign-in attempts by a deactivated member are recorded in the audit trail as a security signal.
+
+<Note>
+  The same lifecycle runs through SCIM. Deprovisioning a user in your IdP does exactly this, and Passport refuses to remove the last active admin. See [SCIM](/enterprise/scim).
+</Note>
+
+## Agent identities
+
+Agent keys are available to owners on every plan under **Settings → Advanced → Headless & CI**. Creating a key also creates a governed agent identity. The `pak_` bearer is shown once and stored only as a hash; its calls have their own access and Activity attribution, and revoking the key retires the identity. On Free, agents count toward the member cap; on paid plans they are not billed as seats.
+
+Passport CLI accepts an agent key through `PASSPORT_AGENT_KEY` with the governed workspace endpoint in `PASSPORT_ENDPOINT`. This mode writes no local credential file, so it is the recommended attach surface for CI, cron, and headless jobs. See [Passport CLI](/quickstart/cli).

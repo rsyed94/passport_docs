@@ -1,0 +1,885 @@
+{
+  "schemaVersion": 1,
+  "task": "discover one namespaced synthetic record-lookup tool, then execute one governed call",
+  "tokenizer": {
+    "encoding": "o200k_base",
+    "counts": "exact for serialized UTF-8 text components",
+    "caveat": "host wrappers and provider billing rules vary"
+  },
+  "protocol": {
+    "mcp": "Streamable HTTP, version negotiated by the installed MCP SDK",
+    "wireMetric": "HTTP JSON body bytes; headers excluded",
+    "cliProcessesPerTask": 2
+  },
+  "environment": {
+    "node": "v24.8.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "repeats": 3,
+  "scenarios": [
+    {
+      "id": "small",
+      "fixture": {
+        "apps": 1,
+        "tools": 8,
+        "resultBytes": 1024
+      },
+      "surfaces": {
+        "flat_mcp": {
+          "surface": "flat_mcp",
+          "toolCount": 10,
+          "modelVisible": {
+            "instructions": {
+              "bytes": 488,
+              "tokens": 110
+            },
+            "toolDefinitions": {
+              "bytes": 5846,
+              "tokens": 1313
+            },
+            "discoveryInvocation": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "discoveryResult": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "executionInvocation": {
+              "bytes": 91,
+              "tokens": 23
+            },
+            "executionResult": {
+              "bytes": 1221,
+              "tokens": 300
+            },
+            "commandText": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "total": {
+              "bytes": 7646,
+              "tokens": 1746
+            }
+          },
+          "wire": {
+            "mcp": {
+              "bytes": 422,
+              "tokens": 128,
+              "requests": 5,
+              "responseBytes": 8131,
+              "responseTokens": 1891,
+              "methods": {
+                "initialize": 1,
+                "notifications/initialized": 1,
+                "non-json": 1,
+                "tools/list": 1,
+                "tools/call": 1
+              }
+            },
+            "auth": {
+              "requests": 0,
+              "requestBytes": 0,
+              "responseBytes": 0
+            }
+          },
+          "processCount": 0,
+          "stderrBytes": 0,
+          "resultSha256": "f2e0dd18e9d7513856b5cd3f6902c1a09e0de9ea2028c2c185f21bf57f4ad06f",
+          "resultTextBytes": 1024,
+          "latencyMs": {
+            "p50": 17.41,
+            "p95": 18.16
+          }
+        },
+        "compact_mcp": {
+          "surface": "compact_mcp",
+          "toolCount": 4,
+          "modelVisible": {
+            "instructions": {
+              "bytes": 830,
+              "tokens": 171
+            },
+            "toolDefinitions": {
+              "bytes": 4576,
+              "tokens": 1026
+            },
+            "discoveryInvocation": {
+              "bytes": 80,
+              "tokens": 15
+            },
+            "discoveryResult": {
+              "bytes": 4220,
+              "tokens": 922
+            },
+            "executionInvocation": {
+              "bytes": 123,
+              "tokens": 31
+            },
+            "executionResult": {
+              "bytes": 1221,
+              "tokens": 300
+            },
+            "commandText": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "total": {
+              "bytes": 11050,
+              "tokens": 2465
+            }
+          },
+          "wire": {
+            "mcp": {
+              "bytes": 593,
+              "tokens": 171,
+              "requests": 6,
+              "responseBytes": 11480,
+              "responseTokens": 2607,
+              "methods": {
+                "initialize": 1,
+                "notifications/initialized": 1,
+                "non-json": 1,
+                "tools/list": 1,
+                "tools/call": 2
+              }
+            },
+            "auth": {
+              "requests": 0,
+              "requestBytes": 0,
+              "responseBytes": 0
+            }
+          },
+          "processCount": 0,
+          "stderrBytes": 0,
+          "resultSha256": "f2e0dd18e9d7513856b5cd3f6902c1a09e0de9ea2028c2c185f21bf57f4ad06f",
+          "resultTextBytes": 1024,
+          "latencyMs": {
+            "p50": 19.89,
+            "p95": 21.02
+          }
+        },
+        "passport_cli": {
+          "surface": "passport_cli",
+          "toolCount": 0,
+          "modelVisible": {
+            "instructions": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "toolDefinitions": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "discoveryInvocation": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "discoveryResult": {
+              "bytes": 3730,
+              "tokens": 833
+            },
+            "executionInvocation": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "executionResult": {
+              "bytes": 1222,
+              "tokens": 300
+            },
+            "commandText": {
+              "bytes": 139,
+              "tokens": 32
+            },
+            "total": {
+              "bytes": 5091,
+              "tokens": 1165
+            }
+          },
+          "wire": {
+            "mcp": {
+              "bytes": 861,
+              "tokens": 255,
+              "requests": 10,
+              "responseBytes": 17405,
+              "responseTokens": 3953,
+              "methods": {
+                "initialize": 2,
+                "notifications/initialized": 2,
+                "non-json": 2,
+                "tools/list": 2,
+                "tools/call": 2
+              }
+            },
+            "auth": {
+              "requests": 2,
+              "requestBytes": 250,
+              "responseBytes": 288
+            }
+          },
+          "processCount": 2,
+          "stderrBytes": 0,
+          "resultSha256": "f2e0dd18e9d7513856b5cd3f6902c1a09e0de9ea2028c2c185f21bf57f4ad06f",
+          "resultTextBytes": 1024,
+          "latencyMs": {
+            "p50": 336.69,
+            "p95": 342.92
+          }
+        }
+      },
+      "savingsVsFlat": {
+        "compact_mcp": {
+          "definitionTokensPct": 78.1,
+          "totalContextTokensPct": 141.2
+        },
+        "passport_cli": {
+          "definitionTokensPct": 0,
+          "totalContextTokensPct": 66.7
+        }
+      }
+    },
+    {
+      "id": "medium",
+      "fixture": {
+        "apps": 6,
+        "tools": 48,
+        "resultBytes": 8192
+      },
+      "surfaces": {
+        "flat_mcp": {
+          "surface": "flat_mcp",
+          "toolCount": 50,
+          "modelVisible": {
+            "instructions": {
+              "bytes": 649,
+              "tokens": 150
+            },
+            "toolDefinitions": {
+              "bytes": 22121,
+              "tokens": 4933
+            },
+            "discoveryInvocation": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "discoveryResult": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "executionInvocation": {
+              "bytes": 91,
+              "tokens": 23
+            },
+            "executionResult": {
+              "bytes": 9345,
+              "tokens": 2250
+            },
+            "commandText": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "total": {
+              "bytes": 32206,
+              "tokens": 7356
+            }
+          },
+          "wire": {
+            "mcp": {
+              "bytes": 422,
+              "tokens": 128,
+              "requests": 5,
+              "responseBytes": 32691,
+              "responseTokens": 7501,
+              "methods": {
+                "initialize": 1,
+                "notifications/initialized": 1,
+                "non-json": 1,
+                "tools/list": 1,
+                "tools/call": 1
+              }
+            },
+            "auth": {
+              "requests": 0,
+              "requestBytes": 0,
+              "responseBytes": 0
+            }
+          },
+          "processCount": 0,
+          "stderrBytes": 0,
+          "resultSha256": "a1a4410d37c46896bc7f5c692692aa945f10fd71e9f84b6f024e0bbf4c4127e4",
+          "resultTextBytes": 8192,
+          "latencyMs": {
+            "p50": 20.71,
+            "p95": 23.32
+          }
+        },
+        "compact_mcp": {
+          "surface": "compact_mcp",
+          "toolCount": 4,
+          "modelVisible": {
+            "instructions": {
+              "bytes": 991,
+              "tokens": 211
+            },
+            "toolDefinitions": {
+              "bytes": 4896,
+              "tokens": 1106
+            },
+            "discoveryInvocation": {
+              "bytes": 80,
+              "tokens": 15
+            },
+            "discoveryResult": {
+              "bytes": 5651,
+              "tokens": 1212
+            },
+            "executionInvocation": {
+              "bytes": 123,
+              "tokens": 31
+            },
+            "executionResult": {
+              "bytes": 9345,
+              "tokens": 2250
+            },
+            "commandText": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "total": {
+              "bytes": 21086,
+              "tokens": 4825
+            }
+          },
+          "wire": {
+            "mcp": {
+              "bytes": 593,
+              "tokens": 171,
+              "requests": 6,
+              "responseBytes": 21516,
+              "responseTokens": 4967,
+              "methods": {
+                "initialize": 1,
+                "notifications/initialized": 1,
+                "non-json": 1,
+                "tools/list": 1,
+                "tools/call": 2
+              }
+            },
+            "auth": {
+              "requests": 0,
+              "requestBytes": 0,
+              "responseBytes": 0
+            }
+          },
+          "processCount": 0,
+          "stderrBytes": 0,
+          "resultSha256": "a1a4410d37c46896bc7f5c692692aa945f10fd71e9f84b6f024e0bbf4c4127e4",
+          "resultTextBytes": 8192,
+          "latencyMs": {
+            "p50": 19.68,
+            "p95": 20.1
+          }
+        },
+        "passport_cli": {
+          "surface": "passport_cli",
+          "toolCount": 0,
+          "modelVisible": {
+            "instructions": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "toolDefinitions": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "discoveryInvocation": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "discoveryResult": {
+              "bytes": 5031,
+              "tokens": 1107
+            },
+            "executionInvocation": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "executionResult": {
+              "bytes": 9346,
+              "tokens": 2250
+            },
+            "commandText": {
+              "bytes": 139,
+              "tokens": 32
+            },
+            "total": {
+              "bytes": 14516,
+              "tokens": 3389
+            }
+          },
+          "wire": {
+            "mcp": {
+              "bytes": 861,
+              "tokens": 255,
+              "requests": 10,
+              "responseBytes": 27922,
+              "responseTokens": 6433,
+              "methods": {
+                "initialize": 2,
+                "notifications/initialized": 2,
+                "non-json": 2,
+                "tools/list": 2,
+                "tools/call": 2
+              }
+            },
+            "auth": {
+              "requests": 2,
+              "requestBytes": 250,
+              "responseBytes": 288
+            }
+          },
+          "processCount": 2,
+          "stderrBytes": 0,
+          "resultSha256": "a1a4410d37c46896bc7f5c692692aa945f10fd71e9f84b6f024e0bbf4c4127e4",
+          "resultTextBytes": 8192,
+          "latencyMs": {
+            "p50": 350.99,
+            "p95": 356.59
+          }
+        }
+      },
+      "savingsVsFlat": {
+        "compact_mcp": {
+          "definitionTokensPct": 22.4,
+          "totalContextTokensPct": 65.6
+        },
+        "passport_cli": {
+          "definitionTokensPct": 0,
+          "totalContextTokensPct": 46.1
+        }
+      }
+    },
+    {
+      "id": "large",
+      "fixture": {
+        "apps": 20,
+        "tools": 160,
+        "resultBytes": 32768
+      },
+      "surfaces": {
+        "flat_mcp": {
+          "surface": "flat_mcp",
+          "toolCount": 162,
+          "modelVisible": {
+            "instructions": {
+              "bytes": 858,
+              "tokens": 204
+            },
+            "toolDefinitions": {
+              "bytes": 67691,
+              "tokens": 15069
+            },
+            "discoveryInvocation": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "discoveryResult": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "executionInvocation": {
+              "bytes": 92,
+              "tokens": 23
+            },
+            "executionResult": {
+              "bytes": 37183,
+              "tokens": 8907
+            },
+            "commandText": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "total": {
+              "bytes": 105824,
+              "tokens": 24203
+            }
+          },
+          "wire": {
+            "mcp": {
+              "bytes": 423,
+              "tokens": 128,
+              "requests": 5,
+              "responseBytes": 106308,
+              "responseTokens": 24348,
+              "methods": {
+                "initialize": 1,
+                "notifications/initialized": 1,
+                "non-json": 1,
+                "tools/list": 1,
+                "tools/call": 1
+              }
+            },
+            "auth": {
+              "requests": 0,
+              "requestBytes": 0,
+              "responseBytes": 0
+            }
+          },
+          "processCount": 0,
+          "stderrBytes": 0,
+          "resultSha256": "19c442eabb82b6a972f81d29bae98712940b8c702b7b456165b9e36ae3e428d0",
+          "resultTextBytes": 32768,
+          "latencyMs": {
+            "p50": 37.69,
+            "p95": 40.26
+          }
+        },
+        "compact_mcp": {
+          "surface": "compact_mcp",
+          "toolCount": 4,
+          "modelVisible": {
+            "instructions": {
+              "bytes": 1200,
+              "tokens": 265
+            },
+            "toolDefinitions": {
+              "bytes": 5312,
+              "tokens": 1212
+            },
+            "discoveryInvocation": {
+              "bytes": 80,
+              "tokens": 15
+            },
+            "discoveryResult": {
+              "bytes": 5932,
+              "tokens": 1250
+            },
+            "executionInvocation": {
+              "bytes": 124,
+              "tokens": 31
+            },
+            "executionResult": {
+              "bytes": 37183,
+              "tokens": 8907
+            },
+            "commandText": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "total": {
+              "bytes": 49831,
+              "tokens": 11680
+            }
+          },
+          "wire": {
+            "mcp": {
+              "bytes": 594,
+              "tokens": 171,
+              "requests": 6,
+              "responseBytes": 50260,
+              "responseTokens": 11822,
+              "methods": {
+                "initialize": 1,
+                "notifications/initialized": 1,
+                "non-json": 1,
+                "tools/list": 1,
+                "tools/call": 2
+              }
+            },
+            "auth": {
+              "requests": 0,
+              "requestBytes": 0,
+              "responseBytes": 0
+            }
+          },
+          "processCount": 0,
+          "stderrBytes": 0,
+          "resultSha256": "19c442eabb82b6a972f81d29bae98712940b8c702b7b456165b9e36ae3e428d0",
+          "resultTextBytes": 32768,
+          "latencyMs": {
+            "p50": 27.17,
+            "p95": 27.55
+          }
+        },
+        "passport_cli": {
+          "surface": "passport_cli",
+          "toolCount": 0,
+          "modelVisible": {
+            "instructions": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "toolDefinitions": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "discoveryInvocation": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "discoveryResult": {
+              "bytes": 5308,
+              "tokens": 1147
+            },
+            "executionInvocation": {
+              "bytes": 0,
+              "tokens": 0
+            },
+            "executionResult": {
+              "bytes": 37184,
+              "tokens": 8907
+            },
+            "commandText": {
+              "bytes": 140,
+              "tokens": 32
+            },
+            "total": {
+              "bytes": 42632,
+              "tokens": 10086
+            }
+          },
+          "wire": {
+            "mcp": {
+              "bytes": 862,
+              "tokens": 255,
+              "requests": 10,
+              "responseBytes": 57291,
+              "responseTokens": 13448,
+              "methods": {
+                "initialize": 2,
+                "notifications/initialized": 2,
+                "non-json": 2,
+                "tools/list": 2,
+                "tools/call": 2
+              }
+            },
+            "auth": {
+              "requests": 2,
+              "requestBytes": 250,
+              "responseBytes": 288
+            }
+          },
+          "processCount": 2,
+          "stderrBytes": 0,
+          "resultSha256": "19c442eabb82b6a972f81d29bae98712940b8c702b7b456165b9e36ae3e428d0",
+          "resultTextBytes": 32768,
+          "latencyMs": {
+            "p50": 361.85,
+            "p95": 365.78
+          }
+        }
+      },
+      "savingsVsFlat": {
+        "compact_mcp": {
+          "definitionTokensPct": 8,
+          "totalContextTokensPct": 48.3
+        },
+        "passport_cli": {
+          "definitionTokensPct": 0,
+          "totalContextTokensPct": 41.7
+        }
+      }
+    }
+  ],
+  "canaries": [
+    {
+      "name": "small: flat exposes fixture + two connection tools",
+      "ok": true,
+      "actual": 10,
+      "expected": "10"
+    },
+    {
+      "name": "small: compact exposes four governed meta-tools",
+      "ok": true,
+      "actual": 4,
+      "expected": "4"
+    },
+    {
+      "name": "small: CLI avoids eager catalog and counts on-demand definitions",
+      "ok": true,
+      "actual": "eager=0, on-demand=833, flat=1313",
+      "expected": "eager=0 and 0 < on-demand < flat"
+    },
+    {
+      "name": "small: every surface returns identical result",
+      "ok": true,
+      "actual": "1 hash(es)",
+      "expected": "1 hash"
+    },
+    {
+      "name": "small: requested result bytes survive every surface",
+      "ok": true,
+      "actual": "1024/1024/1024",
+      "expected": "1024 each"
+    },
+    {
+      "name": "small: flat protocol has one direct call",
+      "ok": true,
+      "actual": 1,
+      "expected": "1"
+    },
+    {
+      "name": "small: compact protocol has search + call",
+      "ok": true,
+      "actual": 2,
+      "expected": "2"
+    },
+    {
+      "name": "small: CLI runs two complete MCP sessions",
+      "ok": true,
+      "actual": "2/2/2",
+      "expected": "2/2/2"
+    },
+    {
+      "name": "small: CLI rotates one credential per process",
+      "ok": true,
+      "actual": 2,
+      "expected": "2"
+    },
+    {
+      "name": "medium: flat exposes fixture + two connection tools",
+      "ok": true,
+      "actual": 50,
+      "expected": "50"
+    },
+    {
+      "name": "medium: compact exposes four governed meta-tools",
+      "ok": true,
+      "actual": 4,
+      "expected": "4"
+    },
+    {
+      "name": "medium: CLI avoids eager catalog and counts on-demand definitions",
+      "ok": true,
+      "actual": "eager=0, on-demand=1107, flat=4933",
+      "expected": "eager=0 and 0 < on-demand < flat"
+    },
+    {
+      "name": "medium: every surface returns identical result",
+      "ok": true,
+      "actual": "1 hash(es)",
+      "expected": "1 hash"
+    },
+    {
+      "name": "medium: requested result bytes survive every surface",
+      "ok": true,
+      "actual": "8192/8192/8192",
+      "expected": "8192 each"
+    },
+    {
+      "name": "medium: flat protocol has one direct call",
+      "ok": true,
+      "actual": 1,
+      "expected": "1"
+    },
+    {
+      "name": "medium: compact protocol has search + call",
+      "ok": true,
+      "actual": 2,
+      "expected": "2"
+    },
+    {
+      "name": "medium: CLI runs two complete MCP sessions",
+      "ok": true,
+      "actual": "2/2/2",
+      "expected": "2/2/2"
+    },
+    {
+      "name": "medium: CLI rotates one credential per process",
+      "ok": true,
+      "actual": 2,
+      "expected": "2"
+    },
+    {
+      "name": "large: flat exposes fixture + two connection tools",
+      "ok": true,
+      "actual": 162,
+      "expected": "162"
+    },
+    {
+      "name": "large: compact exposes four governed meta-tools",
+      "ok": true,
+      "actual": 4,
+      "expected": "4"
+    },
+    {
+      "name": "large: CLI avoids eager catalog and counts on-demand definitions",
+      "ok": true,
+      "actual": "eager=0, on-demand=1147, flat=15069",
+      "expected": "eager=0 and 0 < on-demand < flat"
+    },
+    {
+      "name": "large: every surface returns identical result",
+      "ok": true,
+      "actual": "1 hash(es)",
+      "expected": "1 hash"
+    },
+    {
+      "name": "large: requested result bytes survive every surface",
+      "ok": true,
+      "actual": "32768/32768/32768",
+      "expected": "32768 each"
+    },
+    {
+      "name": "large: flat protocol has one direct call",
+      "ok": true,
+      "actual": 1,
+      "expected": "1"
+    },
+    {
+      "name": "large: compact protocol has search + call",
+      "ok": true,
+      "actual": 2,
+      "expected": "2"
+    },
+    {
+      "name": "large: CLI runs two complete MCP sessions",
+      "ok": true,
+      "actual": "2/2/2",
+      "expected": "2/2/2"
+    },
+    {
+      "name": "large: CLI rotates one credential per process",
+      "ok": true,
+      "actual": 2,
+      "expected": "2"
+    },
+    {
+      "name": "medium: compact definition tokens stay bounded vs flat",
+      "ok": true,
+      "actual": "22.4%",
+      "expected": "<= 35%"
+    },
+    {
+      "name": "medium: compact total task context beats flat",
+      "ok": true,
+      "actual": "65.6%",
+      "expected": "<= 80%"
+    },
+    {
+      "name": "medium: CLI total task context beats flat",
+      "ok": true,
+      "actual": "46.1%",
+      "expected": "<= 80%"
+    },
+    {
+      "name": "large: compact definition tokens stay bounded vs flat",
+      "ok": true,
+      "actual": "8%",
+      "expected": "<= 20%"
+    },
+    {
+      "name": "large: compact total task context beats flat",
+      "ok": true,
+      "actual": "48.3%",
+      "expected": "<= 55%"
+    },
+    {
+      "name": "large: CLI total task context beats flat",
+      "ok": true,
+      "actual": "41.7%",
+      "expected": "<= 55%"
+    }
+  ]
+}
